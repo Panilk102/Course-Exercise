@@ -14,6 +14,11 @@ library(dplyr)
 library(tidyverse)
 library(haven)
 library(usethis)
+
+getwd() 
+
+setwd("C:/Users/DSC/Desktop/R Anil")
+
 #-----------------------------------------------------------
 # 0. Read SDTM LB and ADSL datasets
 #-----------------------------------------------------------
