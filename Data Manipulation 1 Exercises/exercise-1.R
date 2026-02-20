@@ -1,16 +1,31 @@
+
 #-----------------------------------------------------------
 # Exercise 1: Derive ADLB from SDTM LB
 #-----------------------------------------------------------
 
 # Load libraries
-library(dplyr)
 
+install.packages("haven")
+install.packages("usethis")
+install.packages("tidyverse")
+install.packages("dplyr")
+
+library(dplyr)
+library(tidyverse)
+library(haven)
+library(usethis)
 #-----------------------------------------------------------
 # 0. Read SDTM LB and ADSL datasets
 #-----------------------------------------------------------
 
-lb   <- read.csv("sdtm_lb.csv", stringsAsFactors = FALSE)
-adsl <- read.csv("adsl.csv", stringsAsFactors = FALSE)
+
+lb = read_xpt("UpdatedCDISCPilotData/UpdatedCDISCPilotData/SDTM/lb.xpt")
+adsl = read_xpt("UpdatedCDISCPilotData/UpdatedCDISCPilotData/ADAM/adsl.xpt")
+adlb= read_xpt("UpdatedCDISCPilotData/UpdatedCDISCPilotData/ADAM/adlbc.xpt")
+
+
+#lb   <- read.csv("sdtm_lb.csv", stringsAsFactors = FALSE)
+#adsl <- read.csv("adsl.csv", stringsAsFactors = FALSE)
 
 #-----------------------------------------------------------
 # 01. Select Variables
@@ -20,7 +35,7 @@ adsl <- read.csv("adsl.csv", stringsAsFactors = FALSE)
 #-----------------------------------------------------------
 
 adlb_step1 <- lb %>%
-  # Your code here
+  select(STUDYID,USUBJID,LBTEST,LBSTRESN,LBSTRESU,LBDTC,VISITNUM)
   
   
   #-----------------------------------------------------------
@@ -29,8 +44,8 @@ adlb_step1 <- lb %>%
 # and non-missing results.
 #-----------------------------------------------------------
 
-adlb_step2 <- adlb_step1 %>%
-  # Your code here
+adlb_step2 <- adlb %>%
+  filter(SAFFL=="Y", !is.na(AVAL))
   
   
   #-----------------------------------------------------------
@@ -41,8 +56,14 @@ adlb_step2 <- adlb_step1 %>%
 # "Bilirubin" → "BILI"
 #-----------------------------------------------------------
 
-adlb_step3 <- adlb_step2 %>%
-  # Your code here
+adlb_step3 <- adlb_step1 %>%
+ mutate(
+   PARAMCD=case_when(
+     LBTEST== "Alanine Aminotransferase" ~  "ALT",
+     LBTEST== "Aspartate Aminotransferase" ~"AST"  ,     
+     LBTEST== "Bilirubin" ~ "BILI"  
+   )
+ )
   
   
   #-----------------------------------------------------------
@@ -52,7 +73,7 @@ adlb_step3 <- adlb_step2 %>%
 #-----------------------------------------------------------
 
 adlb_step4 <- adlb_step3 %>%
-  # Your code here
+  mutate(AVAL= as.numeric(LBSTRESN))
   
   
   #-----------------------------------------------------------
@@ -61,7 +82,12 @@ adlb_step4 <- adlb_step3 %>%
 #-----------------------------------------------------------
 
 adlb_step5 <- adlb_step4 %>%
-  # Your code here
+  mutate(
+    AVISITN= case_when(
+      VISITNUM == 1 ~ 0,
+      VISITNUM > 1 ~ as.integer(VISITNUM)
+    )
+  )
   
   
   #-----------------------------------------------------------
@@ -71,7 +97,7 @@ adlb_step5 <- adlb_step4 %>%
 #-----------------------------------------------------------
 
 adlb_step6 <- adlb_step5 %>%
-  # Your code here
+    mutate(ABLFL= if_else(AVISITN==0 ,"Y",NA_character_))
   
   
   #-----------------------------------------------------------
@@ -80,11 +106,18 @@ adlb_step6 <- adlb_step5 %>%
 # for each USUBJID and PARAMCD.
 #-----------------------------------------------------------
 
-baseline <- adlb_step6 %>%
-  # Your code here
+adlb_step66 = adlb_step6 %>%
+  filter(PARAMCD %in% c("ALT", "AST", "BILI")) |>
+  mutate(BASE1=if_else(ABLFL== "Y",AVAL,NA_real_))
+
+
+baseline <- adlb_step66 %>%
+  group_by(USUBJID,PARAMCD) %>%
+  mutate(BASE= first(BASE1))
   
+
   
-  adlb_step7 <- adlb_step6 %>%
+ # adlb_step7 <- adlb_step6 %>%
   # Your code here
   
   
@@ -94,8 +127,10 @@ baseline <- adlb_step6 %>%
 # (CHG = AVAL - BASE).
 #-----------------------------------------------------------
 
-adlb_final <- adlb_step7 %>%
-  # Your code here
+adlb_final <- baseline %>%
+    mutate( CHG = AVAL-BASE
+    )
+  
   
   
   #-----------------------------------------------------------
