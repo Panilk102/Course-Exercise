@@ -18,7 +18,13 @@ library(tidyr)
 # 0. Read ADVS dataset
 #-----------------------------------------------------------
 
-advs <- read.csv("ADVS.csv", stringsAsFactors = FALSE)
+
+advs = read_xpt("UpdatedCDISCPilotData/UpdatedCDISCPilotData/SDTM/vs.xpt")
+adsl = read_xpt("UpdatedCDISCPilotData/UpdatedCDISCPilotData/ADAM/adsl.xpt")
+
+#joined with adsl to get treatment variables
+vs_joined = vs %>%
+  inner_join(adsl, by=c("STUDYID","USUBJID"))
 
 #-----------------------------------------------------------
 # 1. Filter Parameter
@@ -26,8 +32,8 @@ advs <- read.csv("ADVS.csv", stringsAsFactors = FALSE)
 # using PARAMCD or VSTESTCD (as applicable).
 #-----------------------------------------------------------
 
-step1 <- advs %>%
-  # Your code here
+step1 <- vs_joined %>%
+ filter(VSTESTCD=="SYSBP")
   
   
   #-----------------------------------------------------------
@@ -38,7 +44,7 @@ step1 <- advs %>%
 #-----------------------------------------------------------
 
 step2 <- step1 %>%
-  # Your code here
+  group_by(TRT01A,VISIT)
   
   
   #-----------------------------------------------------------
@@ -48,8 +54,8 @@ step2 <- step1 %>%
 #-----------------------------------------------------------
 
 step3 <- step2 %>%
-  # Your code here
-  
+  group_by(TRT01A,VISIT) |>
+  summarise(mean_a=mean(VSSTRESN,na.rm=TRUE), .groups = "drop")
   
   #-----------------------------------------------------------
 # 4. Transpose to Wide Format
@@ -61,9 +67,13 @@ step3 <- step2 %>%
 #-----------------------------------------------------------
 
 tfl_table <- step3 %>%
-  # Your code here
+  pivot_wider(
+    id_cols = VISIT,
+    values_from = mean_a,
+    names_from = TRT01A 
+  )
   
-  
+
   #-----------------------------------------------------------
 # 5. Final Table Output
 # Review the transposed table.

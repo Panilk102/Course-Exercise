@@ -29,9 +29,11 @@ advs <- read.csv("ADVS.csv", stringsAsFactors = FALSE)
 # Store vital signs parameters in a vector.
 #-----------------------------------------------------------
 
-params <- c(
-  # Your code here
-)
+#distinct(advs,VSTESTCD,.keep_all = FALSE)
+
+
+
+params <- c("DIABP", "PULSE",  "SYSBP",  "TEMP")
 
 #-----------------------------------------------------------
 # 3. Loop Over Parameters Using map()
@@ -46,12 +48,18 @@ params <- c(
 
 summary_list <- map(
   params,
-  function(param) {
-    
-    # Your code here
+  function(param) { vs_joined|>
+      filter(VSTESTCD==params)|>
+      group_by(TRT01A,VISIT) |>
+      summarise(n_a=n(),
+                mean_a=mean(VSSTRESN,na.rm=TRUE),
+                sd_a=sd(VSSTRESN,na.rm=TRUE)
+                )
     
   }
 )
+
+summary_list[[1]]
 
 #-----------------------------------------------------------
 # 4. Combine Results
@@ -61,7 +69,7 @@ summary_list <- map(
 #-----------------------------------------------------------
 
 final_summary <- 
-  # Your code here
+  bind_rows(summary_list)
   
   
   #-----------------------------------------------------------

@@ -1,3 +1,11 @@
+
+install.packages("haven")
+install.packages("usethis")
+install.packages("tidyverse")
+install.packages("dplyr")
+
+
+
 #-----------------------------------------------------------
 # Exercise 1: Multi-Domain Join
 #-----------------------------------------------------------
@@ -8,13 +16,25 @@
 
 # Load library
 library(dplyr)
+library(tidyverse)
+library(haven)
+library(usethis)
+
+getwd() 
+
+setwd("C:/Users/DSC/Desktop/R Anil")
+
 
 #-----------------------------------------------------------
 # 0. Read ADSL and VS datasets
 #-----------------------------------------------------------
 
-adsl <- read.csv("ADSL.csv", stringsAsFactors = FALSE)
-vs   <- read.csv("VS.csv", stringsAsFactors = FALSE)
+
+
+vs = read_xpt("UpdatedCDISCPilotData/UpdatedCDISCPilotData/SDTM/vs.xpt")
+adsl = read_xpt("UpdatedCDISCPilotData/UpdatedCDISCPilotData/ADAM/adsl.xpt")
+
+
 
 #-----------------------------------------------------------
 # 1. Check Row Counts Before Join
@@ -22,8 +42,9 @@ vs   <- read.csv("VS.csv", stringsAsFactors = FALSE)
 # before performing the join.
 #-----------------------------------------------------------
 
-# Your code here
 
+slv=n_distinct(adsl$USUBJID)
+slvS=n_distinct(vs$USUBJID)
 
 #-----------------------------------------------------------
 # 2. Join ADSL Population Flags onto VS
@@ -31,8 +52,8 @@ vs   <- read.csv("VS.csv", stringsAsFactors = FALSE)
 # using USUBJID.
 #-----------------------------------------------------------
 
-vs_joined <- vs %>%
-  # Your code here
+vs_joined = vs %>%
+  inner_join(adsl, by=c("STUDYID","USUBJID"))
   
   
   #-----------------------------------------------------------
@@ -41,7 +62,7 @@ vs_joined <- vs %>%
 #-----------------------------------------------------------
 
 vs_safety <- vs_joined %>%
-  # Your code here
+  filter(SAFFL=="Y")
   
   
   #-----------------------------------------------------------
@@ -53,7 +74,7 @@ vs_safety <- vs_joined %>%
 #-----------------------------------------------------------
 
 vs_bp <- vs_safety %>%
-  # Your code here
+  filter(VSTESTCD %in% c("SYSBP", "DIABP"))
   
   
   #-----------------------------------------------------------
@@ -64,7 +85,9 @@ vs_bp <- vs_safety %>%
 # - Parameter filter
 #-----------------------------------------------------------
 
-# Your code here
+nrow(vs_joined)
+nrow(vs_safety)
+nrow(vs_bp)
 
 
 #-----------------------------------------------------------

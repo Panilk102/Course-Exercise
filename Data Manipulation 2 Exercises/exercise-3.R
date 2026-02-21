@@ -29,7 +29,8 @@ library(dplyr)
 
 derive_baseline_flag <- function(df, baseline_visit) {
   
-  # Your code here
+   df |>
+    mutate(BASEFL = if_else(VISIT==baseline_visit,"Y",NA_character_))
   
 }
 
@@ -37,7 +38,7 @@ derive_baseline_flag <- function(df, baseline_visit) {
 # 2. Read Sample VS Data
 #-----------------------------------------------------------
 
-vs <- read.csv("VS.csv", stringsAsFactors = FALSE)
+advs = read_xpt("UpdatedCDISCPilotData/UpdatedCDISCPilotData/SDTM/vs.xpt")
 
 #-----------------------------------------------------------
 # 3. Test the Function
@@ -45,8 +46,8 @@ vs <- read.csv("VS.csv", stringsAsFactors = FALSE)
 # using baseline visit = "SCREENING".
 #-----------------------------------------------------------
 
-vs_with_basefl <- 
-  # Your code here
+vs_with_basefl = 
+  derive_baseline_flag(vs,"BASELINE")
   
   
   #-----------------------------------------------------------
@@ -55,7 +56,8 @@ vs_with_basefl <-
 #-----------------------------------------------------------
 
 # Your code here
-
+check = vs_with_basefl |>
+  filter(BASEFL !=VSBLFL)
 
 #-----------------------------------------------------------
 # End of Exercise
