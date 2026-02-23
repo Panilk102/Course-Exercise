@@ -25,11 +25,9 @@ aestdtc_char <- "2024-01-20"
 # from character to Date format.
 #-----------------------------------------------------------
 
-trtsdt <- 
-  # Your code here
+trtsdt <- as.Date(trtsdt_char)
   
-  aestdtc <- 
-  # Your code here
+aestdtc <- ymd(aestdtc_char)
   
   
   #-----------------------------------------------------------
@@ -40,8 +38,9 @@ trtsdt <-
 # - If event date < treatment start → negative day
 #-----------------------------------------------------------
 
+
 astdy <- 
-  # Your code here
+  as.integer(trtsdt-aestdtc) + if_else(aestdtc >= trtsdt, 1L,0L)
   
   
   #-----------------------------------------------------------
@@ -51,7 +50,7 @@ astdy <-
 #-----------------------------------------------------------
 
 duration_days <- 
-  # Your code here
+  as.integer(trtsdt-aestdtc) + 1
   
   
   #-----------------------------------------------------------
@@ -59,9 +58,25 @@ duration_days <-
 # Print or check ASTDY value.
 #-----------------------------------------------------------
 
-# Your code here
+view(astdy)
 
 
 #-----------------------------------------------------------
 # End of Exercise
 #-----------------------------------------------------------
+
+
+trstdt = "2026-02-21"
+
+adt = c("2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21", "2026-02-22", "2026-02-23" )
+
+dtf = data.frame(trstdt, adt)
+
+
+adtdy = dtf |>
+  mutate(ady = as.integer(as.Date(adt)-as.Date(trstdt)) + if_else(as.Date(adt) >= as.Date(trstdt),1L,0L),
+         dun =as.integer(as.Date(adt)-as.Date(trstdt)) +1)
+
+
+
+

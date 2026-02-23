@@ -42,9 +42,10 @@ df <- data.frame(
 # Extract first part before first dash.
 #-----------------------------------------------------------
 
-df_step1 <- df %>%
-  # Your code here
-  
+df_step1 = df |>
+  mutate (study = str_sub(USUBJID, 1, 8))
+
+
   
   #-----------------------------------------------------------
 # 3. Extract Country Code
@@ -52,7 +53,7 @@ df_step1 <- df %>%
 #-----------------------------------------------------------
 
 df_step2 <- df_step1 %>%
-  # Your code here
+  mutate(cou = word(USUBJID,2,sep="-"))
   
   
   #-----------------------------------------------------------
@@ -62,7 +63,7 @@ df_step2 <- df_step1 %>%
 #-----------------------------------------------------------
 
 df_step3 <- df_step2 %>%
-  # Your code here
+  mutate(SUBJID_SHORT = str_c(word(USUBJID,3,sep="-"),word(USUBJID,4,sep="-"),sep="-"))
   
   
   #-----------------------------------------------------------
@@ -71,8 +72,8 @@ df_step3 <- df_step2 %>%
 # are from "USA" sites.
 #-----------------------------------------------------------
 
-usa_check <- 
-  # Your code here
+usa_check <- df_step3 |>
+ filter(str_detect(USUBJID,"USA")== TRUE)
   
   
   #-----------------------------------------------------------
